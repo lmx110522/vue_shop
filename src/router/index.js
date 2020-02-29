@@ -2,6 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from "../components/Login";
 import Home from "../components/Home";
+import Welcome from "../components/Welcome";
+import Users from "../components/user/Users";
 import '../assets/css/global.css'
 
 import axios from 'axios'
@@ -9,6 +11,12 @@ import axios from 'axios'
 Vue.prototype.$http = axios
 // 配置请求的根路径
 axios.defaults.baseURL = 'https://www.liulongbin.top:8888/api/private/v1/'
+// axios请求拦截器
+axios.interceptors.request.use(config => {
+    console.log(config)
+    config.headers.Authorization = window.sessionStorage.getItem('token')
+    return config
+})
 Vue.use(VueRouter)
 
 const routes = [
@@ -22,7 +30,19 @@ const routes = [
     },
     {
         path: "/home",
-        component: Home
+        component: Home,
+        redirect: "/welcome",
+        children: [
+            {
+                path: '/welcome',
+                component: Welcome
+            },
+            {
+                path: '/users',
+                component: Users
+            }
+
+        ]
     }
 ]
 
