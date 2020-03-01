@@ -26,3 +26,5 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### Finish Auth Page 20200301 by Limaozhan
 页面照片地址 http://qiniuyun.donghao.club/0CBE314B-B8C2-485B-A2D3-507918BCD8A7.png
+### Finish Categories Page 20200301 by Limaozhan
+页面照片地址 http://qiniuyun.donghao.club/E0468134-95BF-4724-B9A9-552A4E05D13B.png
