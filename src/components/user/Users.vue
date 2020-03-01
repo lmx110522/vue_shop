@@ -55,7 +55,8 @@
                         <el-button type="danger" size="mini" icon="el-icon-delete"
                                    @click="removeUserById(scope.row.id)"></el-button>
                         <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
-                            <el-button type="warning" size="mini" icon="el-icon-setting"></el-button>
+                            <el-button type="warning" size="mini" icon="el-icon-setting"
+                                       @click="shareRole(scope.row)"></el-button>
                         </el-tooltip>
 
                     </template>
@@ -116,6 +117,32 @@
                 <el-button @click="editDialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="editUser()">确 定</el-button>
             </span>
+        </el-dialog>
+        <el-dialog
+                title="分配角色"
+                :visible.sync="roleDialogVisible"
+                width="50%" @close="closeRoleDialog()">
+            <div>
+                <p>当前用户:{{userInfo.username}}</p>
+                <p>当前角色:{{userInfo.role_name}}</p>
+                <p>
+                    <template>
+                        <el-select v-model="selectRoleId" placeholder="请选择新角色">
+                            <el-option
+                                    v-for="item in roleList"
+                                    v-if="item.roleName != userInfo.role_name"
+                                    :key="item.id"
+                                    :label="item.roleName"
+                                    :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </template>
+                </p>
+            </div>
+            <span slot="footer" class="dialog-footer">
+    <el-button @click="roleDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="saveRole(userInfo.id)">分 配</el-button>
+  </span>
         </el-dialog>
     </div>
 </template>
@@ -198,7 +225,11 @@
                         {required: true, message: '请输入邮箱地址', trigger: 'blur'},
                         {validator: checkEmail, trigger: 'blur'}
                     ]
-                }
+                },
+                roleDialogVisible: false,
+                userInfo: [],
+                roleList: [],
+                selectRoleId: ''
             }
         },
         methods: {
@@ -279,7 +310,7 @@
                         message: '删除成功!'
                     });
                     this.getUserList()
-                    console.log("当前数量:"+this.userList.length)
+                    console.log("当前数量:" + this.userList.length)
                     console.log(this.queryInfo.pagenum)
                     if (this.userList.length <= 1 && this.queryInfo.pagenum > 1) {
                         this.queryInfo.pagenum = this.queryInfo.pagenum - 1
@@ -293,12 +324,31 @@
                 }
             },
             async showEditDialg(id) {
-                console.log(id)
                 const {data: res} = await this.$http.get("users/" + id);
                 if (res.meta.status !== 200) return this.$message.error("未找到对应的用户")
                 console.log(res)
                 this.editUserForm = res.data
                 this.editDialogVisible = true
+            },
+            async shareRole(item) {
+                this.userInfo = item
+                const {data: res} = await this.$http.get('roles')
+                if (res.meta.status !== 200) return this.$message.error("获取角列表失败")
+                console.log(res.data)
+                this.roleList = res.data
+                this.roleDialogVisible = true
+            },
+            async saveRole(id) {
+                const {data: res} = await this.$http.put(`users/${id}/role`, {'rid': this.selectRoleId})
+                console.log(res)
+                if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+                this.$message.success("分配角色成功")
+                this.getUserList()
+                this.roleDialogVisible = false
+            },
+            closeRoleDialog() {
+                this.selectRoleId = ''
+                this.userInfo = ''
             }
         },
         created() {
