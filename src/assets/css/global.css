@@ -1,9 +1,10 @@
 /*全局样式表*/
 
-html, body {
+html, body,#app {
     height: 100%;
     padding: 0;
     margin: 0;
+    min-width: 1366px;
 }
 
 .el-breadcrumb{
